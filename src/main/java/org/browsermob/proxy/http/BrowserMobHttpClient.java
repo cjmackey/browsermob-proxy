@@ -151,7 +151,26 @@ public class BrowserMobHttpClient {
         };
         credsProvider = new WildcardMatchingCredentialsProvider();
         httpClient.setCredentialsProvider(credsProvider);
-        httpClient.addRequestInterceptor(new PreemptiveAuth(), 0);
+        //httpClient.addRequestInterceptor(new PreemptiveAuth(), 0);
+        
+        httpClient.addRequestInterceptor(new HttpRequestInterceptor() {
+            @Override
+            public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+                HttpHost targetHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+                String host = targetHost.getHostName();
+                Pattern pattern = Pattern.compile("(m.|)[a-z]+[a-z]+\\.animoto\\.com$");
+                
+                //PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("outfilename", true)));
+                //out.println("the text "+host);
+                //out.close();
+                
+                if(pattern.matcher(host).find()){
+                    request.removeHeaders("Authorization");
+                    request.addHeader("Authorization", System.getenv().get("ANIMOTO_BASIC_AUTH_HEADER"));
+                }
+            }
+        });
+        
         httpClient.getParams().setParameter(ClientPNames.HANDLE_REDIRECTS, true);
         httpClient.getParams().setParameter(CookieSpecPNames.SINGLE_COOKIE_HEADER, Boolean.TRUE);
         setRetryCount(0);

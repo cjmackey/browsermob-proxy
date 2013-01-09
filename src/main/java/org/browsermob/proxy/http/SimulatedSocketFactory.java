@@ -115,7 +115,7 @@ public class SimulatedSocketFactory implements SchemeSocketFactory {
         //TODO: this has to be changed to HttpInetSocketAddress once we upgrade to 4.2.1
         InetSocketAddress remoteAddr = remoteAddress;
         if (this.hostNameResolver != null) {
-            remoteAddr = new InetSocketAddress(this.hostNameResolver.resolve(remoteAddress.getHostString()), remoteAddress.getPort());
+            remoteAddr = new InetSocketAddress(this.hostNameResolver.resolve(remoteAddress.getHostName()), remoteAddress.getPort());
         }
 
         int timeout = HttpConnectionParams.getConnectionTimeout(params);
